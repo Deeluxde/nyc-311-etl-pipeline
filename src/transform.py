@@ -1,10 +1,15 @@
 import pandas as pd
+from src.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def transform_data(df):
     """
     Clean and transform NYC 311 data.
     """
+
+    logger.info("Starting data transformation")
 
     # Remove duplicate records
     df = df.drop_duplicates()
@@ -19,20 +24,22 @@ def transform_data(df):
         .str.replace(")", "", regex=False)
     )
 
-    # Remove leading/trailing spaces from text columns
+    # Clean string columns
     for col in df.select_dtypes(include="object"):
         df[col] = df[col].astype(str).str.strip()
 
-    # Convert dates
+    # Convert date columns
     df["created_date"] = pd.to_datetime(
-        df["created_date"], errors="coerce"
+        df["created_date"],
+        errors="coerce"
     )
 
     df["closed_date"] = pd.to_datetime(
-        df["closed_date"], errors="coerce"
+        df["closed_date"],
+        errors="coerce"
     )
 
-    # Keep only columns needed for SQLite table
+    # Keep only the required columns
     df = df[
         [
             "unique_key",
@@ -63,6 +70,7 @@ def transform_data(df):
         }
     )
 
-    print(f"Rows after cleaning: {len(df)}")
+    logger.info(f"Rows after cleaning: {len(df)}")
+    logger.info("Data transformation completed successfully.")
 
     return df

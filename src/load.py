@@ -1,11 +1,16 @@
 import sqlite3
 import pandas as pd
+from src.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def load_data(df, db_path, schema_path):
     """
     Load transformed data into SQLite.
     """
+
+    logger.info("Starting data load")
 
     db_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -29,7 +34,11 @@ def load_data(df, db_path, schema_path):
         conn,
     )
 
-    print("\nSQLite database created successfully!")
+    logger.info("SQLite database created successfully")
+    logger.info(f"Total rows loaded: {row_count.iloc[0]['total_rows']}")
+
     print(row_count)
 
     conn.close()
+
+    logger.info("Database connection closed")
