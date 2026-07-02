@@ -1,19 +1,35 @@
 import pandas as pd
-from src.logger import get_logger
 
+from config import SAMPLE_SIZE
+from src.logger import get_logger
 
 logger = get_logger(__name__)
 
-
 def extract_data(file_path):
     """
-    Extract data from the CSV file.
+    Extract NYC 311 data from a CSV file.
     """
 
     logger.info("Starting data extraction")
 
-    df = pd.read_csv(file_path, nrows=5000)
+    try:
+        df = pd.read_csv(
+            file_path,
+            nrows=SAMPLE_SIZE
+        )
 
-    logger.info(f"Rows extracted: {len(df)}")
+        logger.info(f"Rows extracted: {len(df):,}")
 
-    return df
+        return df
+
+    except FileNotFoundError:
+        logger.exception("CSV file not found.")
+        raise
+
+    except pd.errors.ParserError:
+        logger.exception("Unable to parse CSV file.")
+        raise
+
+    except Exception:
+        logger.exception("Unexpected error during extraction.")
+        raise
